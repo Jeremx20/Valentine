@@ -81,79 +81,69 @@ button:hover {
 <body>
 
 <div id="box">
-    <!-- Section mot de passe initiale -->
-    <div id="passwordSection">
-        <h2>Pour entrer dans la surprise ❤️</h2>
-        <p>Indice : notre anniv</p>
-        <input type="text" id="passwordInput" placeholder="Écris le mot de passe…">
-        <button id="enterButton">Entrer</button>
-    </div>
+    <h2>Pour entrer dans la surprise ❤️</h2>
+    <p>Indice : notre anniv</p>
+    <input type="text" id="passwordInput" placeholder="Écris le mot de passe…">
+    <button id="enterButton">Entrer</button>
 
-    <!-- Messages + photos -->
-    <div id="contentSection" style="display:none;">
-        <div id="message"></div>
-        <img id="photoDisplay" src="" alt="">
-        <button id="nextButton" onclick="nextMessage()" style="display:none;">Continuer</button>
-    </div>
+    <div id="message" style="display:none;"></div>
+    <img id="photoDisplay" src="" alt="">
+    <button id="nextButton" onclick="nextMessage()" style="display:none;">Continuer</button>
 </div>
 
 <script>
-// Messages + photos
+// Tous tes messages
 const messages = [
-"1. Je voulais faire quelque chose d’un peu différent…",
-"2. Pas juste un message sur WhatsApp.",
-"3. Pas un 'je t’aime' balancé comme ça.",
-"4. Juste quelque chose de spécial.",
-"5. Tu sais… moi de base je n’ai jamais vraiment fêté ça.",
-"6. Mais pour toi, je voulais faire un truc mignon avec mon imagination.",
-"7. Trouver une façon un peu différente de te dire à quel point tu comptes pour moi.",
-"8. Sincèrement la façon dont tu rends mes journées meilleures sans effort est incroyable.",
-"9. Ça fait presque un an que tu me donnes le sourire tous les jours.",
-"10. Que tu m’énerves… mais que tu m’apportes une paix immense en même temps.",
-"11. Que tu m’apprends à aimer plus profondément.",
-"12. Aujourd’hui même si je ne suis pas là physiquement…",
-"13. Je veux juste te remercier pour ta présence dans ma vie.",
-"14. Te dire que je t’aime. Et je veux te rendre heureuse.",
-"15. Alors, joyeuse Saint-Valentin mon amour ❤️  ----->> ",
-"16. C’est pas fini…",
-"17. J’ai encore quelque chose à te montrer.",
-"18. D'abord tes fleurs et ton chocolat 💐🍫 ",
-"19. TANT QU'IL Y'A CONTINUER, CONTINUE ",
+"Je voulais faire quelque chose d’un peu différent…",
+"Pas juste un message sur WhatsApp.",
+"Pas un 'je t’aime' balancé comme ça.",
+"Juste quelque chose de spécial.",
+"Tu sais… moi de base je n’ai jamais vraiment fêté ça.",
+"Mais pour toi, je voulais faire un truc mignon avec mon imagination.",
+"Trouver une façon un peu différente de te dire à quel point tu comptes pour moi.",
+"Sincèrement la façon dont tu rends mes journées meilleures sans effort est incroyable.",
+"Ça fait presque un an que tu me donnes le sourire tous les jours.",
+"Que tu m’énerves… mais que tu m’apportes une paix immense en même temps.",
+"Que tu m’apprends à aimer plus profondément.",
+"Aujourd’hui même si je ne suis pas là physiquement…",
+"Je veux juste te remercier pour ta présence dans ma vie.",
+"Te dire que je t’aime. Et je veux te rendre heureuse.",
+"Alors, joyeuse Saint-Valentin mon amour ❤️  ----->> ",
+"C’est pas fini…",
+"J’ai encore quelque chose à te montrer.",
+"D'abord tes fleurs et ton chocolat 💐🍫 ",
+"ALLEZ MA LONGUE PETITE ROUTE A COMMENCE !", // ton texte entre bienvenue et 1
 
-{ text: "20. Ma femme responsable que le seigneur bénit et qu'il continuera de bénir ❤️ ", photo: "photo1.jpeg" },
-{ text: "21. Que personne ne retire ce sourire que j'aime tant ❤️.", photo: "photo2.jpeg" },
-{ text: "22. Et que le seigneur te garde près de ton homme ❤️", photo: "photo3.jpeg" },
-{ text: "23. POUR MA PRINCESSE ❤️", photo: "photo4.jpeg"}, 
-{ text: "24. EH PARDON JE ME SUIS TROMPÉ !"},
-{ text: "25. Voilà pour toi mon coeur ❤️", photo: "photo5.jpeg" },
-{ text: "26. Bon c'est la finnnn !"}
+{ text: "1. Ma femme responsable que le seigneur bénit et qu'il continuera de bénir ❤️ ", photo: "photo1.jpeg" },
+{ text: "2. Que personne ne retire ce sourire que j'aime tant ❤️.", photo: "photo2.jpeg" },
+{ text: "3. Et que le seigneur te garde près de ton homme ❤️", photo: "photo3.jpeg" },
+{ text: "4. POUR MA PRINCESSE ❤️", photo: "photo4.jpeg" }, 
+{ text: "EH PARDON JE ME SUIS TROMPÉ !"},
+{ text: "5. Voilà pour toi mon coeur ❤️", photo: "photo5.jpeg" },
+{ text: "6. Bon c'est la finnnn !" }
 ];
 
-let index = -1; // commence à -1 pour le message "ALLEZ MA LONGUE PETITE ROUTE A COMMENCE"
+let index = 0;
 
 // ✅ Vérification du mot de passe (secret)
 document.getElementById("enterButton").addEventListener("click", () => {
     const pass = document.getElementById("passwordInput").value.trim();
 
     if(pass === "11/03") {
-        // cacher la section mot de passe
-        document.getElementById("passwordSection").style.display = "none";
+        // cacher le champ et le bouton
+        document.getElementById("passwordInput").style.display = "none";
+        document.querySelector("#box p").style.display = "none";
+        document.getElementById("enterButton").style.display = "none";
 
-        // afficher le contenu des messages
-        const content = document.getElementById("contentSection");
-        content.style.display = "block";
-
-        // afficher "Bienvenue !"
+        // afficher "Bienvenue !" pendant 1,5s
         const messageBox = document.getElementById("message");
         messageBox.style.display = "block";
         messageBox.innerText = "Bienvenue ! 🤍";
         messageBox.style.opacity = 1;
 
-        // après 1,5s, passer au message intermédiaire
         setTimeout(() => {
-            messageBox.innerText = "ALLEZ PRÉPARE TES DOIGTS À CLIQUER 😂❤️";
+            messageBox.innerText = "";
             document.getElementById("nextButton").style.display = "inline-block";
-            index = 0; // on prépare la suite des messages
         }, 1500);
 
     } else {
@@ -172,24 +162,30 @@ function nextMessage() {
         img.style.opacity = 0;
 
         setTimeout(() => {
+            // Par défaut, on cache l'image
             img.style.display = "none";
+            img.src = "";
 
             if (typeof messages[index] === "string") {
                 messageBox.innerText = messages[index];
-            } else {
+            } else if (messages[index].photo) {
                 messageBox.innerText = messages[index].text;
                 img.src = messages[index].photo;
                 img.style.display = "block";
                 setTimeout(() => { img.style.opacity = 1; }, 50);
+            } else {
+                messageBox.innerText = messages[index].text || "";
             }
 
             messageBox.style.opacity = 1;
             index++;
         }, 300);
+
     } else {
         nextBtn.style.display = "none";
         messageBox.innerText = "Merci d’avoir cliqué jusqu’au bout 🤍";
         img.style.display = "none";
+        img.src = "";
     }
 }
 </script>
