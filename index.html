@@ -16,7 +16,7 @@ body {
     background-size: 400% 400%;
     animation: gradient 10s ease infinite;
     overflow: hidden;
-    transition: background 1s;
+    transition: background 1s ease;
 }
 
 @keyframes gradient {
@@ -35,7 +35,6 @@ body {
     box-shadow: 0 20px 50px rgba(0,0,0,0.2);
     position: relative;
     z-index: 10;
-    transition: background 1s, color 1s;
 }
 
 h2 { margin-top: 0; }
@@ -60,16 +59,14 @@ button {
     transition: 0.3s;
 }
 
-button:hover {
-    background: #ff1a8c;
-    transform: scale(1.05);
-}
+button:hover { background: #ff1a8c; transform: scale(1.05); }
 
 #message {
     font-size: 1.2em;
     min-height: 80px;
     margin-bottom: 20px;
-    transition: opacity 0.6s;
+    opacity: 0;
+    transition: opacity 0.6s ease;
 }
 
 img {
@@ -78,7 +75,8 @@ img {
     width: 100%;
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    transition: opacity 0.6s;
+    opacity: 0;
+    transition: opacity 0.8s ease;
 }
 
 /* Coeurs animés */
@@ -95,26 +93,22 @@ img {
     100% { transform: translateY(-10vh); opacity: 0; }
 }
 
-/* Étoiles tombantes */
+/* Pluie d'étoiles finale */
 .star {
     position: absolute;
-    color: gold;
-    font-size: 15px;
-    animation: fall 4s linear infinite;
-    z-index: 20;
+    color: white;
+    font-size: 10px;
+    animation: starFall 4s linear infinite;
 }
-
-@keyframes fall {
-    to { transform: translateY(100vh) rotate(360deg); }
+@keyframes starFall {
+    0% { transform: translateY(-10vh); opacity: 0; }
+    10% { opacity: 1; }
+    100% { transform: translateY(100vh); opacity: 0; }
 }
-
-/* Timer (facultatif) */
-#timer { margin-top: 15px; font-size: 0.9em; color: #555; }
 </style>
 </head>
 
 <body>
-
 <audio id="bgMusic" src="levis.mpeg" loop></audio>
 
 <div id="box">
@@ -139,37 +133,19 @@ img {
 
 <div id="mainPage" style="display:none;">
     <h2>Juste pour toi 🤍</h2>
-    <div id="message">Clique et profite…</div>
+    <div id="message"></div>
     <img id="photoDisplay" src="" alt="">
     <button onclick="nextMessage()">Continuer</button>
+</div>
+
+<div id="finalPage" style="display:none; background:black; color:white; padding:40px; border-radius:25px; text-align:center;">
+    <h2 id="finalMessage"></h2>
+    <button onclick="restart()" style="margin-top:20px;">Revoir depuis le début</button>
 </div>
 
 </div>
 
 <script>
-function checkPassword() {
-    const input = document.getElementById("passwordInput").value;
-    if (input === "11/03") {
-        document.getElementById("passwordPage").style.display = "none";
-        document.getElementById("welcomePage").style.display = "block";
-    } else {
-        alert("Tala tu veux me dire que tu ne connais pas");
-    }
-}
-
-function startJourney() {
-    document.getElementById("welcomePage").style.display = "none";
-    document.getElementById("introPage").style.display = "block";
-}
-
-function startMessages() {
-    document.getElementById("introPage").style.display = "none";
-    document.getElementById("mainPage").style.display = "block";
-    document.getElementById("bgMusic").play();
-    createHearts();
-    startTimer();
-}
-
 const messages = [
 "Je voulais faire quelque chose d’un peu différent…",
 "Pas juste un message sur WhatsApp.",
@@ -200,110 +176,90 @@ const messages = [
 
 let index = 0;
 
-function nextMessage() {
-    const messageBox = document.getElementById("message");
-    const img = document.getElementById("photoDisplay");
-
-    if (index < messages.length) {
-        img.style.display = "none";
-        messageBox.style.opacity = 0;
-
-        setTimeout(() => {
-            if (typeof messages[index] === "string") {
-                messageBox.innerText = messages[index];
-            } else {
-                messageBox.innerText = messages[index].text;
-                img.src = messages[index].photo;
-                img.style.display = "block";
-                setTimeout(()=> img.style.opacity = 1, 50);
-            }
-            messageBox.style.opacity = 1;
-            index++;
-        }, 300);
-    } else {
-        // Dernière page noire spéciale
-        const main = document.getElementById("mainPage");
-        main.style.background = "black";
-        main.style.color = "white";
-        messageBox.innerText = "C'EST LA FIN ❤️"; // message au centre reste visible
-
-        createHearts();
-        launchStars();
-        launchJeTaime();
-
-        addRestartButton();
-        document.querySelector("#mainPage button").style.display = "none";
-    }
+function checkPassword() {
+    const input = document.getElementById("passwordInput").value;
+    if(input==="11/03"){
+        document.getElementById("passwordPage").style.display="none";
+        document.getElementById("welcomePage").style.display="block";
+    } else { alert("Tala tu veux me dire que tu ne connais pas"); }
 }
 
-// Coeurs flottants
-function createHearts() {
-    setInterval(() => {
-        let heart = document.createElement("div");
-        heart.className = "heart";
-        heart.innerHTML = "❤️";
-        heart.style.left = Math.random()*100 + "vw";
-        heart.style.fontSize = (15 + Math.random()*20) + "px";
+function startJourney(){
+    document.getElementById("welcomePage").style.display="none";
+    document.getElementById("introPage").style.display="block";
+}
+
+function startMessages(){
+    document.getElementById("introPage").style.display="none";
+    document.getElementById("mainPage").style.display="block";
+    document.getElementById("bgMusic").play();
+    createHearts();
+    nextMessage();
+}
+
+function nextMessage(){
+    const msgBox=document.getElementById("message");
+    const img=document.getElementById("photoDisplay");
+
+    msgBox.style.opacity=0;
+    img.style.opacity=0;
+
+    setTimeout(()=>{
+        img.style.display="none";
+        if(typeof messages[index]==="string"){
+            msgBox.innerText=messages[index];
+        } else {
+            msgBox.innerText=messages[index].text;
+            img.src=messages[index].photo;
+            img.style.display="block";
+            setTimeout(()=>{ img.style.opacity=1; },50);
+        }
+        msgBox.style.opacity=1;
+        index++;
+        if(index>=messages.length){
+            document.getElementById("mainPage").style.display="none";
+            startFinalPage();
+        }
+    },300);
+}
+
+/* Coeurs animés */
+function createHearts(){
+    setInterval(()=>{
+        const heart=document.createElement("div");
+        heart.className="heart";
+        heart.innerHTML="❤️";
+        heart.style.left=Math.random()*100+"vw";
+        heart.style.fontSize=(15+Math.random()*20)+"px";
         document.body.appendChild(heart);
         setTimeout(()=>heart.remove(),6000);
-    }, 500);
+    },500);
 }
 
-// Étoiles tombantes
-function launchStars() {
-    setInterval(() => {
-        let star = document.createElement("div");
-        star.className = "star";
-        star.innerHTML = "⭐";
-        star.style.left = Math.random()*100 + "vw";
-        star.style.fontSize = (10 + Math.random()*15) + "px";
+/* Pluie d'étoiles finale */
+function createStars(){
+    setInterval(()=>{
+        const star=document.createElement("div");
+        star.className="star";
+        star.innerHTML="✦";
+        star.style.left=Math.random()*100+"vw";
+        star.style.fontSize=(5+Math.random()*10)+"px";
         document.body.appendChild(star);
         setTimeout(()=>star.remove(),4000);
-    }, 300);
+    },200);
 }
 
-// Je t'aime qui tombe
-function launchJeTaime() {
-    setInterval(() => {
-        let jt = document.createElement("div");
-        jt.style.position = "absolute";
-        jt.style.color = "pink";
-        jt.style.fontSize = (15 + Math.random()*20) + "px";
-        jt.style.left = Math.random()*100 + "vw";
-        jt.style.top = "-50px";
-        jt.style.zIndex = "20";
-        jt.innerText = "Je t'aime ❤️";
-        jt.style.opacity = 1;
-        jt.style.transition = "top 4s linear, opacity 4s linear";
-
-        document.body.appendChild(jt);
-        setTimeout(() => {
-            jt.style.top = "100vh";
-            jt.style.opacity = 0;
-        }, 50);
-
-        setTimeout(()=> jt.remove(), 4000);
-    }, 400);
+function startFinalPage(){
+    document.body.style.background="black";
+    const final=document.getElementById("finalPage");
+    final.style.display="block";
+    document.getElementById("finalMessage").innerText="Bon c'est la finnnn ! Merci d’avoir cliqué jusqu’au bout 🤍";
+    createStars();
 }
 
-// Bouton recommencer
-function addRestartButton() {
-    let btn = document.createElement("button");
-    btn.innerText = "Revoir depuis le début 💌";
-    btn.style.marginTop = "20px";
-    btn.onclick = () => location.reload();
-    document.getElementById("mainPage").appendChild(btn);
-}
-
-// Timer facultatif
-function startTimer() {
-    const timer = document.getElementById("timer");
-    let start = new Date("2025-03-11");
-    let today = new Date("2026-02-14");
-    let diff = Math.floor((today-start)/(1000*60*60*24));
-    timer.innerText = `Nous sommes ensemble depuis ${diff} jours ❤️`;
+function restart(){
+    location.reload();
 }
 </script>
-
 </body>
 </html>
