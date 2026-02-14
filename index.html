@@ -11,10 +11,12 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-family: Arial, sans-serif;
+    font-family: 'Segoe UI', sans-serif;
     background: linear-gradient(-45deg, #ff9ecf, #ffd6ec, #ffe6f7, #ffc2e2);
     background-size: 400% 400%;
     animation: gradient 10s ease infinite;
+    overflow: hidden;
+    transition: background 1s;
 }
 
 @keyframes gradient {
@@ -24,39 +26,26 @@ body {
 }
 
 #box {
-    background: white;
+    background: rgba(255,255,255,0.95);
     padding: 40px;
-    border-radius: 20px;
+    border-radius: 25px;
     width: 85%;
     max-width: 420px;
     text-align: center;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+    position: relative;
+    z-index: 10;
+    transition: background 1s, color 1s;
 }
 
-#message {
-    font-size: 1.2em;
-    min-height: 80px;
-    margin-bottom: 20px;
-    transition: opacity 0.4s ease;
-}
-
-img {
-    display: none;
-    margin-top: 15px;
-    width: 100%;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    opacity: 0;
-    transition: opacity 0.6s ease;
-}
+h2 { margin-top: 0; }
 
 input {
     padding: 10px;
-    font-size: 1em;
-    border-radius: 10px;
+    border-radius: 20px;
     border: 1px solid #ccc;
-    margin-bottom: 15px;
-    width: 70%;
+    text-align: center;
+    margin-top: 15px;
 }
 
 button {
@@ -68,126 +57,251 @@ button {
     background: #ff4da6;
     color: white;
     cursor: pointer;
-    transition: transform 0.2s ease, background 0.2s ease;
+    transition: 0.3s;
 }
 
 button:hover {
     background: #ff1a8c;
     transform: scale(1.05);
 }
+
+#message {
+    font-size: 1.2em;
+    min-height: 80px;
+    margin-bottom: 20px;
+    transition: opacity 0.6s;
+}
+
+img {
+    display: none;
+    margin-top: 15px;
+    width: 100%;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    transition: opacity 0.6s;
+}
+
+/* Coeurs animés */
+.heart {
+    position: absolute;
+    color: rgba(255,0,100,0.7);
+    font-size: 20px;
+    animation: floatUp 6s linear infinite;
+}
+
+@keyframes floatUp {
+    0% { transform: translateY(100vh); opacity: 0; }
+    20% { opacity: 1; }
+    100% { transform: translateY(-10vh); opacity: 0; }
+}
+
+/* Étoiles tombantes */
+.star {
+    position: absolute;
+    color: gold;
+    font-size: 15px;
+    animation: fall 4s linear infinite;
+    z-index: 20;
+}
+
+@keyframes fall {
+    to { transform: translateY(100vh) rotate(360deg); }
+}
+
+/* Timer (facultatif) */
+#timer { margin-top: 15px; font-size: 0.9em; color: #555; }
 </style>
 </head>
 
 <body>
 
-<div id="box">
-    <!-- Section mot de passe initiale -->
-    <div id="passwordSection">
-        <h2>Pour entrer dans la surprise ❤️</h2>
-        <p>Indice : notre anniv</p>
-        <input type="text" id="passwordInput" placeholder="Écris le mot de passe…">
-        <button id="enterButton">Entrer</button>
-    </div>
+<audio id="bgMusic" src="levis.mpeg" loop></audio>
 
-    <!-- Messages + photos -->
-    <div id="contentSection" style="display:none;">
-        <div id="message"></div>
-        <img id="photoDisplay" src="" alt="">
-        <button id="nextButton" onclick="nextMessage()" style="display:none;">Continuer</button>
-    </div>
+<div id="box">
+
+<div id="passwordPage">
+    <h2>Une petite surprise 🤍</h2>
+    <p>Indice : notre anniv</p>
+    <input type="password" id="passwordInput" placeholder="Mot de passe">
+    <br>
+    <button onclick="checkPassword()">Entrer</button>
+</div>
+
+<div id="welcomePage" style="display:none;">
+    <h2>Bienvenue ! ❤️</h2>
+    <button onclick="startJourney()">Continuer</button>
+</div>
+
+<div id="introPage" style="display:none;">
+    <h2>ALLEZ MA LONGUE PETITE ROUTE A COMMENCÉ ❤️</h2>
+    <button onclick="startMessages()">Commencer</button>
+</div>
+
+<div id="mainPage" style="display:none;">
+    <h2>Juste pour toi 🤍</h2>
+    <div id="message">Clique et profite…</div>
+    <img id="photoDisplay" src="" alt="">
+    <button onclick="nextMessage()">Continuer</button>
+</div>
+
 </div>
 
 <script>
-// Messages + photos
-const messages = [
-"1. Je voulais faire quelque chose d’un peu différent…",
-"2. Pas juste un message sur WhatsApp.",
-"3. Pas un 'je t’aime' balancé comme ça.",
-"4. Juste quelque chose de spécial.",
-"5. Tu sais… moi de base je n’ai jamais vraiment fêté ça.",
-"6. Mais pour toi, je voulais faire un truc mignon avec mon imagination.",
-"7. Trouver une façon un peu différente de te dire à quel point tu comptes pour moi.",
-"8. Sincèrement la façon dont tu rends mes journées meilleures sans effort est incroyable.",
-"9. Ça fait presque un an que tu me donnes le sourire tous les jours.",
-"10. Que tu m’énerves… mais que tu m’apportes une paix immense en même temps.",
-"11. Que tu m’apprends à aimer plus profondément.",
-"12. Aujourd’hui même si je ne suis pas là physiquement…",
-"13. Je veux juste te remercier pour ta présence dans ma vie.",
-"14. Te dire que je t’aime. Et je veux te rendre heureuse.",
-"15. Alors, joyeuse Saint-Valentin mon amour ❤️  ----->> ",
-"16. C’est pas fini…",
-"17. J’ai encore quelque chose à te montrer.",
-"18. D'abord tes fleurs et ton chocolat 💐🍫 ",
-"19. TANT QU'IL Y'A CONTINUER, CONTINUE ",
+function checkPassword() {
+    const input = document.getElementById("passwordInput").value;
+    if (input === "11/03") {
+        document.getElementById("passwordPage").style.display = "none";
+        document.getElementById("welcomePage").style.display = "block";
+    } else {
+        alert("Tala tu veux me dire que tu ne connais pas");
+    }
+}
 
-{ text: "20. Ma femme responsable que le seigneur bénit et qu'il continuera de bénir ❤️ ", photo: "photo1.jpeg" },
-{ text: "21. Que personne ne retire ce sourire que j'aime tant ❤️.", photo: "photo2.jpeg" },
-{ text: "22. Et que le seigneur te garde près de ton homme ❤️", photo: "photo3.jpeg" },
-{ text: "23. POUR MA PRINCESSE ❤️", photo: "photo4.jpeg"}, 
-{ text: "24. EH PARDON JE ME SUIS TROMPÉ !"},
-{ text: "25. Voilà pour toi mon coeur ❤️", photo: "photo5.jpeg" },
-{ text: "26. Bon c'est la finnnn !"}
+function startJourney() {
+    document.getElementById("welcomePage").style.display = "none";
+    document.getElementById("introPage").style.display = "block";
+}
+
+function startMessages() {
+    document.getElementById("introPage").style.display = "none";
+    document.getElementById("mainPage").style.display = "block";
+    document.getElementById("bgMusic").play();
+    createHearts();
+    startTimer();
+}
+
+const messages = [
+"Je voulais faire quelque chose d’un peu différent…",
+"Pas juste un message sur WhatsApp.",
+"Pas un 'je t’aime' balancé comme ça.",
+"Juste quelque chose de spécial.",
+"Tu sais… moi de base je n’ai jamais vraiment fêté ça.",
+"Mais pour toi, je voulais faire un truc mignon avec mon imagination.",
+"Trouver une façon un peu différente de te dire à quel point tu comptes pour moi.",
+"Sincèrement la façon dont tu rends mes journées meilleures sans effort est incroyable.",
+"Ça fait presque un an que tu me donnes le sourire tous les jours.",
+"Que tu m’énerves… mais que tu m’apportes une paix immense en même temps.",
+"Que tu m’apprends à aimer plus profondément.",
+"Aujourd’hui même si je ne suis pas là physiquement…",
+"Je veux juste te remercier pour ta présence dans ma vie.",
+"Te dire que je t’aime. Et je veux te rendre heureuse.",
+"Alors, joyeuse Saint-Valentin mon amour ❤️",
+"C’est pas fini…",
+"J’ai encore quelque chose à te montrer.",
+"D'abord tes fleurs et ton chocolat 💐🍫",
+{ text: "Ma femme responsable que le seigneur bénit ❤️", photo: "photo1.jpeg" },
+{ text: "Que personne ne retire ce sourire que j'aime tant ❤️.", photo: "photo2.jpeg" },
+{ text: "Et que le seigneur te garde près de ton homme ❤️", photo: "photo3.jpeg" },
+{ text: "POUR MA PRINCESSE ❤️", photo: "photo4.jpeg"}, 
+{ text: "EH PARDON JE ME SUIS TROMPÉ !"},
+{ text: "Voilà pour toi mon coeur ❤️", photo: "photo5.jpeg" },
+{ text: "Bon c'est la finnnn !"}
 ];
 
-let index = -1; // commence à -1 pour le message intermédiaire
+let index = 0;
 
-// ✅ Vérification du mot de passe (secret)
-document.getElementById("enterButton").addEventListener("click", () => {
-    const pass = document.getElementById("passwordInput").value.trim();
-
-    if(pass === "11/03") {
-        document.getElementById("passwordSection").style.display = "none";
-        const content = document.getElementById("contentSection");
-        content.style.display = "block";
-
-        const messageBox = document.getElementById("message");
-        messageBox.style.display = "block";
-        messageBox.innerText = "Bienvenue ! 🤍";
-        messageBox.style.opacity = 1;
-
-        setTimeout(() => {
-            messageBox.innerText = "ALLEZ MA LONGUE PETITE ROUTE A COMMENCE 😂❤️";
-            document.getElementById("nextButton").style.display = "inline-block";
-            index = 0;
-        }, 1500);
-    } else {
-        alert("ORG TU CONNAIS PAS NOTRE DATE ?");
-    }
-});
-
-// Logique des messages et photos
 function nextMessage() {
     const messageBox = document.getElementById("message");
     const img = document.getElementById("photoDisplay");
-    const nextBtn = document.getElementById("nextButton");
 
     if (index < messages.length) {
+        img.style.display = "none";
         messageBox.style.opacity = 0;
-        img.style.opacity = 0;
 
         setTimeout(() => {
-            // seulement afficher image si elle existe
             if (typeof messages[index] === "string") {
                 messageBox.innerText = messages[index];
-                img.style.display = "none";
             } else {
                 messageBox.innerText = messages[index].text;
-                if (messages[index].photo) {
-                    img.src = messages[index].photo;
-                    img.style.display = "block";
-                    setTimeout(() => { img.style.opacity = 1; }, 50);
-                } else {
-                    img.style.display = "none";
-                }
+                img.src = messages[index].photo;
+                img.style.display = "block";
+                setTimeout(()=> img.style.opacity = 1, 50);
             }
             messageBox.style.opacity = 1;
             index++;
         }, 300);
     } else {
-        nextBtn.style.display = "none";
-        messageBox.innerText = "Merci d’avoir cliqué jusqu’au bout 🤍";
-        img.style.display = "none";
+        // Dernière page noire spéciale
+        const main = document.getElementById("mainPage");
+        main.style.background = "black";
+        main.style.color = "white";
+        messageBox.innerText = "C'EST LA FIN ❤️"; // message au centre reste visible
+
+        createHearts();
+        launchStars();
+        launchJeTaime();
+
+        addRestartButton();
+        document.querySelector("#mainPage button").style.display = "none";
     }
+}
+
+// Coeurs flottants
+function createHearts() {
+    setInterval(() => {
+        let heart = document.createElement("div");
+        heart.className = "heart";
+        heart.innerHTML = "❤️";
+        heart.style.left = Math.random()*100 + "vw";
+        heart.style.fontSize = (15 + Math.random()*20) + "px";
+        document.body.appendChild(heart);
+        setTimeout(()=>heart.remove(),6000);
+    }, 500);
+}
+
+// Étoiles tombantes
+function launchStars() {
+    setInterval(() => {
+        let star = document.createElement("div");
+        star.className = "star";
+        star.innerHTML = "⭐";
+        star.style.left = Math.random()*100 + "vw";
+        star.style.fontSize = (10 + Math.random()*15) + "px";
+        document.body.appendChild(star);
+        setTimeout(()=>star.remove(),4000);
+    }, 300);
+}
+
+// Je t'aime qui tombe
+function launchJeTaime() {
+    setInterval(() => {
+        let jt = document.createElement("div");
+        jt.style.position = "absolute";
+        jt.style.color = "pink";
+        jt.style.fontSize = (15 + Math.random()*20) + "px";
+        jt.style.left = Math.random()*100 + "vw";
+        jt.style.top = "-50px";
+        jt.style.zIndex = "20";
+        jt.innerText = "Je t'aime ❤️";
+        jt.style.opacity = 1;
+        jt.style.transition = "top 4s linear, opacity 4s linear";
+
+        document.body.appendChild(jt);
+        setTimeout(() => {
+            jt.style.top = "100vh";
+            jt.style.opacity = 0;
+        }, 50);
+
+        setTimeout(()=> jt.remove(), 4000);
+    }, 400);
+}
+
+// Bouton recommencer
+function addRestartButton() {
+    let btn = document.createElement("button");
+    btn.innerText = "Revoir depuis le début 💌";
+    btn.style.marginTop = "20px";
+    btn.onclick = () => location.reload();
+    document.getElementById("mainPage").appendChild(btn);
+}
+
+// Timer facultatif
+function startTimer() {
+    const timer = document.getElementById("timer");
+    let start = new Date("2025-03-11");
+    let today = new Date("2026-02-14");
+    let diff = Math.floor((today-start)/(1000*60*60*24));
+    timer.innerText = `Nous sommes ensemble depuis ${diff} jours ❤️`;
 }
 </script>
 
