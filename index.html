@@ -115,7 +115,7 @@ img {
 
 <div id="passwordPage">
     <h2>Une petite surprise 🤍</h2>
-    <p>Indice : notre anniv</p>
+    <p>Indice : Notre anniv</p>
     <input type="password" id="passwordInput" placeholder="Mot de passe">
     <br>
     <button onclick="checkPassword()">Entrer</button>
@@ -135,7 +135,7 @@ img {
     <h2>Juste pour toi 🤍</h2>
     <div id="message"></div>
     <img id="photoDisplay" src="" alt="">
-    <button onclick="nextMessage()">Continuer</button>
+    <button id="nextBtn" onclick="nextMessage()">Continuer</button>
 </div>
 
 <div id="finalPage" style="display:none; background:black; color:white; padding:40px; border-radius:25px; text-align:center;">
@@ -171,7 +171,7 @@ const messages = [
 { text: "POUR MA PRINCESSE ❤️", photo: "photo4.jpeg"}, 
 { text: "EH PARDON JE ME SUIS TROMPÉ !"},
 { text: "Voilà pour toi mon coeur ❤️", photo: "photo5.jpeg" },
-{ text: "Bon c'est la finnnn !"}
+{ text: "For You ❤️", photo: "photo6.jpg" }
 ];
 
 let index = 0;
@@ -181,7 +181,7 @@ function checkPassword() {
     if(input==="11/03"){
         document.getElementById("passwordPage").style.display="none";
         document.getElementById("welcomePage").style.display="block";
-    } else { alert("Tala tu veux me dire que tu ne connais pas"); }
+    } else { alert("HEEEEE tu veux me dire que tu ne connais pas ?"); }
 }
 
 function startJourney(){
@@ -198,29 +198,33 @@ function startMessages(){
 }
 
 function nextMessage(){
-    const msgBox=document.getElementById("message");
-    const img=document.getElementById("photoDisplay");
+    const msgBox = document.getElementById("message");
+    const img = document.getElementById("photoDisplay");
+    const nextBtn = document.getElementById("nextBtn");
 
-    msgBox.style.opacity=0;
-    img.style.opacity=0;
+    msgBox.style.opacity = 0;
+    img.style.opacity = 0;
 
-    setTimeout(()=>{
-        img.style.display="none";
-        if(typeof messages[index]==="string"){
-            msgBox.innerText=messages[index];
+    setTimeout(() => {
+        img.style.display = "none";
+        if (typeof messages[index] === "string") {
+            msgBox.innerText = messages[index];
         } else {
-            msgBox.innerText=messages[index].text;
-            img.src=messages[index].photo;
-            img.style.display="block";
+            msgBox.innerText = messages[index].text;
+            img.src = messages[index].photo;
+            img.style.display = "block";
             setTimeout(()=>{ img.style.opacity=1; },50);
         }
-        msgBox.style.opacity=1;
+        msgBox.style.opacity = 1;
+
         index++;
-        if(index>=messages.length){
-            document.getElementById("mainPage").style.display="none";
-            startFinalPage();
+
+        // Après photo6, afficher le bouton pour la vraie page finale
+        if(index === messages.length){
+            nextBtn.innerText = "Bon bah... ❤️";
+            nextBtn.onclick = startFinalPage;
         }
-    },300);
+    }, 300);
 }
 
 /* Coeurs animés */
@@ -250,10 +254,11 @@ function createStars(){
 }
 
 function startFinalPage(){
+    document.getElementById("mainPage").style.display="none";
     document.body.style.background="black";
     const final=document.getElementById("finalPage");
     final.style.display="block";
-    document.getElementById("finalMessage").innerText="Bon c'est la finnn ! Merci d’avoir cliqué jusqu’au bout. Je t'aime Mercia 🤍";
+    document.getElementById("finalMessage").innerText="C'est la fin ! Merci d’avoir cliqué 27 fois pour moi ahah. Je t'aime ma Mercia 🤍";
     createStars();
 }
 
